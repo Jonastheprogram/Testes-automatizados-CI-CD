@@ -1,0 +1,9 @@
+﻿namespace Api.Esg.Fiap.ViewModel
+{
+    public class ResiduoCreateViewModel
+    {
+        public string NomeResiduo { get; set; }
+        public string TipoResiduo { get; set; }
+        public double Peso { get; set; }
+    }
+}

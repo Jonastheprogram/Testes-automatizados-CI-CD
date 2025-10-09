@@ -1,0 +1,6 @@
+@Api.Esg.Fiap_HostAddress = http://localhost:5255
+
+GET {{Api.Esg.Fiap_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api-esg-fiap:
+    # Constrói a imagem a partir do Dockerfile no diretório atual
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-esg-fiap
+    # Mapeia a porta 8080 do host para a porta 8080 do contêiner
+    ports:
+      - "8080:8080"
+    # Carrega variáveis de ambiente de um arquivo .env para configuração local
+    env_file:
+      - .env
+    networks:
+      - esg-network
+
+# Define uma rede customizada para os serviços
+networks:
+  esg-network:
+    driver: bridge

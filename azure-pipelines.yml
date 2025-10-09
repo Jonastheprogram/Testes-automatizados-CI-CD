@@ -1,0 +1,95 @@
+# Define o gatilho: executa o pipeline em cada push para a branch 'main'
+trigger:
+- main
+
+# Utiliza um pool de agentes gerenciados pela Microsoft com a imagem mais recente do Ubuntu
+pool:
+  vmImage: 'ubuntu-latest'
+
+# Define variáveis utilizadas ao longo do pipeline
+variables:
+  # Nome do serviço de registro de contêiner do Azure (ACR)
+  azureContainerRegistry: 'seuACR' # <-- Substitua pelo nome do seu ACR
+  # Nome da imagem Docker a ser criada
+  imageRepository: 'apiesgfiap'
+  # Tag da imagem (utiliza o BuildId para garantir unicidade)
+  tag: '$(Build.BuildId)'
+  # Conexão de serviço do Azure DevOps para o Azure
+  azureSubscription: 'suaAzureSubscription' # <-- Substitua pelo nome da sua conexão de serviço
+  # Nome da aplicação web no Azure (Staging)
+  webAppNameStaging: 'api-esg-fiap-staging' # <-- Substitua
+  # Nome da aplicação web no Azure (Produção)
+  webAppNameProduction: 'api-esg-fiap-prod' # <-- Substitua
+  # Caminho para o Dockerfile
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+
+stages:
+- stage: Build
+  displayName: 'Build, Test & Push'
+  jobs:
+  - job: BuildAndPush
+    displayName: 'Build Docker image and push to ACR'
+    steps:
+    - task: Docker@2
+      displayName: 'Build and Push Docker Image'
+      inputs:
+        # Comando para construir e enviar a imagem
+        command: 'buildAndPush'
+        # Repositório (nome da imagem)
+        repository: '$(imageRepository)'
+        # Caminho do Dockerfile
+        dockerfile: '$(dockerfilePath)'
+        # Conexão com o Azure Container Registry
+        containerRegistry: '$(azureContainerRegistry)'
+        # Tags da imagem
+        tags: |
+          $(tag)
+          latest
+
+- stage: Deploy_Staging
+  displayName: 'Deploy to Staging'
+  # Depende da conclusão bem-sucedida do estágio de Build
+  dependsOn: Build
+  jobs:
+  - deployment: DeployWebAppStaging
+    displayName: 'Deploy to Staging Web App'
+    # Define o ambiente de destino no Azure DevOps
+    environment: 'staging'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            displayName: 'Deploy to Azure Web App for Containers (Staging)'
+            inputs:
+              # Conexão de serviço do Azure
+              azureSubscription: '$(azureSubscription)'
+              # Nome da aplicação web de staging
+              appName: '$(webAppNameStaging)'
+              # Configuração da imagem a ser utilizada
+              imageName: '$(azureContainerRegistry).azurecr.io/$(imageRepository):$(tag)'
+
+- stage: Deploy_Production
+  displayName: 'Deploy to Production'
+  # Depende da conclusão bem-sucedida do estágio de Staging
+  dependsOn: Deploy_Staging
+  jobs:
+  - deployment: DeployWebAppProduction
+    displayName: 'Deploy to Production Web App'
+    # Define o ambiente de destino e adiciona uma verificação de aprovação manual
+    environment:
+      name: 'production'
+      resourceType: VirtualMachine # O tipo é apenas uma formalidade para aprovações
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            displayName: 'Deploy to Azure Web App for Containers (Production)'
+            inputs:
+              # Conexão de serviço do Azure
+              azureSubscription: '$(azureSubscription)'
+              # Nome da aplicação web de produção
+              appName: '$(webAppNameProduction)'
+              # Configuração da imagem a ser utilizada
+              imageName: '$(azureContainerRegistry).azurecr.io/$(imageRepository):$(tag)'
