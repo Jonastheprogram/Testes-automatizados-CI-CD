@@ -1,30 +1,28 @@
-
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-EXPOSE 80
-EXPOSE 8080
-EXPOSE 8081
-USER app
-
+# Estágio 1: Build 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
+WORKDIR /source
 
-COPY ["Api.Esg.Fiap.csproj", "./"]
-RUN dotnet restore "./Api.Esg.Fiap.csproj"
+# Restaura as dependências da solução inteira 
+COPY *.sln .
+COPY Api.Esg.Fiap/*.csproj ./Api.Esg.Fiap/
+RUN dotnet restore
 
-
+# Copia todo o código
 COPY . .
 
 
-RUN dotnet build "./Api.Esg.Fiap.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+# Publica a aplicação 
+WORKDIR /source/Api.Esg.Fiap
+RUN dotnet publish -c Release -o /app/out --no-restore
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Api.Esg.Fiap.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+# Estágio 2: Final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+
+EXPOSE 8080
+
+# Copia apenas o resultado final da publicação
+COPY --from=build /app/out .
 ENTRYPOINT ["dotnet", "Api.Esg.Fiap.dll"]
