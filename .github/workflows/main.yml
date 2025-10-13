@@ -1,0 +1,90 @@
+# .github/workflows/main.yml
+
+name: Build and Deploy ApiEsgFiap to Azure
+
+# Gatilho: Inicia o workflow em cada push na branch 'main'
+on:
+  push:
+    branches: [ "main" ]
+
+# Variáveis de ambiente, baseadas no seu azure-pipelines.yml
+env:
+  AZURE_WEBAPP_NAME_STAGING: 'api-esg-fiap-staging'   #
+  AZURE_WEBAPP_NAME_PROD: 'api-esg-fiap-prod'         #
+  AZURE_CONTAINER_REGISTRY: 'rgapiesgfiap'            # Nome do seu ACR (ajuste se for diferente)
+  IMAGE_NAME: 'apiesgfiap'                          #
+
+jobs:
+  # --- JOB 1: BUILD E PUSH DA IMAGEM DOCKER ---
+  build:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Faz o login no Azure Container Registry (ACR)
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # 3. Constrói a imagem Docker e envia para o ACR
+      - name: Build and push image to ACR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+
+  # --- JOB 2: DEPLOY PARA O AMBIENTE DE STAGING ---
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build # Garante que este job só rode após o sucesso do job 'build'
+    environment:
+      name: Staging # Define o ambiente de deploy
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      # 1. Faz login no Azure para poder gerenciar os recursos
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 2. Faz o deploy da imagem no Azure Web App
+      - name: Deploy to Azure Web App for Containers
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME_STAGING }}
+          images: '${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}'
+
+  # --- JOB 3: DEPLOY PARA O AMBIENTE DE PRODUÇÃO (COM APROVAÇÃO MANUAL) ---
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging # Garante que este job só rode após o sucesso do deploy em Staging
+    environment:
+      name: Production # Define o ambiente de Produção, que terá a regra de aprovação
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      # 1. Faz login no Azure
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 2. Faz o deploy no Azure Web App
+      - name: Deploy to Azure Web App for Containers
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME_PROD }}
+          images: '${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}'
