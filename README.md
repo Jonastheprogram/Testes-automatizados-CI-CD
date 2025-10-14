@@ -42,9 +42,9 @@ O workflow é definido no arquivo `.github/workflows/main.yml` e acionado a cada
     * Este ambiente serve para validação final em um ambiente idêntico ao de produção. 
 
 3.  **`deploy-production` (Deploy para Produção):**
-    * [cite_start]Este job depende do sucesso do deploy em Staging. [cite: 12]
-    * [cite_start]**Possui uma trava de aprovação manual:** Utilizando a funcionalidade "Environments" do GitHub, o workflow pausa e exige que um revisor aprovado clique em "Approve" para continuar. [cite: 10] [cite_start]Isso garante controle total sobre as liberações em produção. [cite: 11]
-    * [cite_start]Após a aprovação, o Azure App Service de **Produção** é atualizado com a mesma imagem validada em Staging. [cite: 12]
+    * Este depende do sucesso do deploy em Staging. 
+    * **Possui uma trava de aprovação manual:** Utilizando a funcionalidade "Environments" do GitHub, o workflow pausa e exige que um revisor aprovado clique em "Approve" para continuar. Isso garante controle total sobre as liberações em produção. 
+    * Após a aprovação, o Azure App Service de **Produção** é atualizado com a mesma imagem validada em Staging. 
       
 
 ## 🐳 Containerização
