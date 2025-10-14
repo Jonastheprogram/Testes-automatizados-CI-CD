@@ -1,6 +1,6 @@
 # Projeto - Api Esg Fiap CI-CD
 
-Este repositório contém o código-fonte e a infraestrutura de CI/CD para a API do projeto Api ESG FIAP. A aplicação foi desenvolvida em .NET, containerizada com Docker e configurada para deploy automatizado na nuvem Microsoft Azure através do Azure DevOps.
+Este repositório contém o código-fonte e a infraestrutura de CI/CD para a API do projeto Api ESG FIAP. A aplicação foi desenvolvida em .NET, containerizada com Docker e configurada para deploy automatizado na nuvem Microsoft Azure através do GitHub Actions.
 
 ## Como executar localmente com Docker
 
@@ -18,34 +18,34 @@ Para executar a aplicação em seu ambiente de desenvolvimento local, garantindo
     
 4.  A aplicação estará disponível no seu navegador ou ferramenta de API no endereço `http://localhost:8080`.
 
-## ⚙️ Pipeline CI/CD
+## ⚙️ Pipeline CI/CD com GitHub Actions
 
-O pipeline de Integração Contínua e Deployment Contínuo (CI/CD) foi implementado utilizando **Azure DevOps** para automatizar todo o ciclo de vida da aplicação, desde o código até a produção.
+[cite_start]O pipeline de Integração Contínua e Deployment Contínuo (CI/CD) foi implementado utilizando **GitHub Actions**, a ferramenta de automação nativa do GitHub, para construir, testar e implantar a aplicação na nuvem Azure. [cite: 5]
 
 ### Ferramentas Utilizadas
-* **Azure DevOps:** Orquestração do pipeline, gerenciamento de builds e releases.
+* **GitHub Actions:** Orquestração do workflow de CI/CD, execução de jobs e gerenciamento de segredos.
 * **Azure Container Registry (ACR):** Repositório privado para armazenar as imagens Docker geradas pelo pipeline.
 * **Azure App Service for Containers:** Serviço de hospedagem para executar a aplicação em contêineres nos ambientes de nuvem.
 
-### Etapas do Pipeline
-O pipeline é definido no arquivo `azure-pipelines.yml` e acionado a cada `push` na branch `main`. Ele consiste em três estágios:
+### Lógica e Etapas do Workflow
+[cite_start]O workflow é definido no arquivo `.github/workflows/main.yml` e acionado a cada `push` na branch `main`. [cite: 7] Ele consiste em três passos sequenciais:
 
-1.  **Build, Test & Push:**
-    * O código-fonte é clonado.
-    * As dependências do projeto .NET são restauradas.
-    * Os testes automatizados são executados para garantir a qualidade do código. Se um teste falhar, o pipeline é interrompido.
-    * Uma imagem Docker é construída a partir do `Dockerfile`.
-    * A imagem é marcada com um número de build único e enviada (push) para o Azure Container Registry.
+1.  **`build` (Build, Test & Push):**
+    * O código-fonte é clonado para um executor (runner) virtual.
+    * As dependências do projeto .NET são restauradas e os testes automatizados são executados.
+    * [cite_start]Uma imagem Docker é construída a partir do `Dockerfile`. [cite: 8]
+    * [cite_start]A imagem é marcada com o hash do commit (garantindo rastreabilidade) e enviada (push) para o Azure Container Registry. [cite: 8]
 
-2.  **Deploy to Staging (testes):**
-    * Executado automaticamente após o sucesso do estágio de Build.
-    * O Azure App Service do ambiente de **Staging** é atualizado com a nova imagem Docker.
-    * Este ambiente serve para validação e testes finais em um ambiente semelhante ao de produção.
+2.  **`deploy-staging` (Deploy para Staging):**
+    * Executado automaticamente após o sucesso do job `build`.
+    * [cite_start]O Azure App Service do ambiente de **Staging** é atualizado com a nova imagem Docker. [cite: 9]
+    * [cite_start]Este ambiente serve para validação final em um ambiente idêntico ao de produção. [cite: 9]
 
-3.  **Deploy to Production:**
-    * Este estágio depende do sucesso do deploy em Staging.
-    * **Possui uma trava de aprovação manual:** O pipeline pausa e aguarda a aprovação de um responsável. É uma boa prática para garantir que apenas versões validadas e aprovadas cheguem ao ambiente de produção.
-    * Após a aprovação, o Azure App Service de **Produção** é atualizado com a mesma imagem que foi validada em Staging.
+3.  **`deploy-production` (Deploy para Produção):**
+    * [cite_start]Este job depende do sucesso do deploy em Staging. [cite: 12]
+    * [cite_start]**Possui uma trava de aprovação manual:** Utilizando a funcionalidade "Environments" do GitHub, o workflow pausa e exige que um revisor aprovado clique em "Approve" para continuar. [cite: 10] [cite_start]Isso garante controle total sobre as liberações em produção. [cite: 11]
+    * [cite_start]Após a aprovação, o Azure App Service de **Produção** é atualizado com a mesma imagem validada em Staging. [cite: 12]
+      
 
 ## 🐳 Containerização
 
@@ -93,22 +93,26 @@ ENTRYPOINT ["dotnet", "Api.Esg.Fiap.dll"]
 
 **(Instrução: Insira aqui os seus prints. Substitua os `placeholders` abaixo)**
 
-### Pipeline em Execução no Azure DevOps
-`[COLE AQUI O PRINT DO SEU PIPELINE RODANDO COM SUCESSO]`
-
-### Aprovação Manual para Produção
-`[COLE AQUI O PRINT DA TELA DE APROVAÇÃO MANUAL]`
+### Pipeline em Execução no GitHub Actions
+![1](https://github.com/user-attachments/assets/d2b8b2ac-0769-49d0-85de-e396117ae73a)
 
 ### Ambiente de Staging Funcionando
-`[COLE AQUI O PRINT DA SUA API RODANDO NO AMBIENTE DE STAGING]`
+![5](https://github.com/user-attachments/assets/bd91f62b-ddc5-4adf-b331-854bc7c70705)
+
+
+### Aprovação Manual para Produção
+![3](https://github.com/user-attachments/assets/867b4147-499d-4621-877c-9f651ca2f995)
+
 
 ### Ambiente de Produção Funcionando
-`[COLE AQUI O PRINT DA SUA API RODANDO NO AMBIENTE DE PRODUÇÃO]`
+![4](https://github.com/user-attachments/assets/1699edf5-eab0-479f-b00b-94ff0fad1145)
+
+
 
 ## 💻 Tecnologias Utilizadas
-* **Backend:** .NET 8, C#
+* **Backend:** .NET 8, C#, Oracle SQL
 * **Containerização:** Docker, Docker Compose
-* **Plataforma de CI/CD:** Azure DevOps
+* **Plataforma de CI/CD:** GitHub Actions
 * **Nuvem:** Microsoft Azure (Azure App Service, Azure Container Registry)
 * **Controle de Versão:** Git
 
