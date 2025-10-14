@@ -20,7 +20,7 @@ Para executar a aplicação em seu ambiente de desenvolvimento local, garantindo
 
 ## ⚙️ Pipeline CI/CD com GitHub Actions
 
-[cite_start]O pipeline de Integração Contínua e Deployment Contínuo (CI/CD) foi implementado utilizando **GitHub Actions**, a ferramenta de automação nativa do GitHub, para construir, testar e implantar a aplicação na nuvem Azure. [cite: 5]
+O pipeline de Integração Contínua e Deployment Contínuo (CI/CD) foi implementado utilizando **GitHub Actions**, a ferramenta de automação nativa do GitHub, para construir, testar e implantar a aplicação na nuvem Azure. [cite: 5]
 
 ### Ferramentas Utilizadas
 * **GitHub Actions:** Orquestração do workflow de CI/CD, execução de jobs e gerenciamento de segredos.
@@ -28,18 +28,18 @@ Para executar a aplicação em seu ambiente de desenvolvimento local, garantindo
 * **Azure App Service for Containers:** Serviço de hospedagem para executar a aplicação em contêineres nos ambientes de nuvem.
 
 ### Lógica e Etapas do Workflow
-[cite_start]O workflow é definido no arquivo `.github/workflows/main.yml` e acionado a cada `push` na branch `main`. [cite: 7] Ele consiste em três passos sequenciais:
+O workflow é definido no arquivo `.github/workflows/main.yml` e acionado a cada `push` na branch `main`. Consiste em três passos sequenciais:
 
 1.  **`build` (Build, Test & Push):**
     * O código-fonte é clonado para um executor (runner) virtual.
     * As dependências do projeto .NET são restauradas e os testes automatizados são executados.
-    * [cite_start]Uma imagem Docker é construída a partir do `Dockerfile`. [cite: 8]
-    * [cite_start]A imagem é marcada com o hash do commit (garantindo rastreabilidade) e enviada (push) para o Azure Container Registry. [cite: 8]
+    * Uma imagem Docker é construída a partir do `Dockerfile`. 
+    * A imagem é marcada com o hash do commit (garantindo rastreabilidade) e enviada (push) para o Azure Container Registry. 
 
 2.  **`deploy-staging` (Deploy para Staging):**
     * Executado automaticamente após o sucesso do job `build`.
-    * [cite_start]O Azure App Service do ambiente de **Staging** é atualizado com a nova imagem Docker. [cite: 9]
-    * [cite_start]Este ambiente serve para validação final em um ambiente idêntico ao de produção. [cite: 9]
+    * O Azure App Service do ambiente de **Staging** é atualizado com a nova imagem Docker. 
+    * Este ambiente serve para validação final em um ambiente idêntico ao de produção. 
 
 3.  **`deploy-production` (Deploy para Produção):**
     * [cite_start]Este job depende do sucesso do deploy em Staging. [cite: 12]
