@@ -1,5 +1,3 @@
-# .github/workflows/main.yml
-
 name: Build and Deploy ApiEsgFiap to Azure
 
 # Gatilho: Inicia o workflow em cada push na branch 'main'
