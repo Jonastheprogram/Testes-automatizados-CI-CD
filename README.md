@@ -20,7 +20,7 @@ Para executar a aplicação em seu ambiente de desenvolvimento local, garantindo
 
 ## ⚙️ Pipeline CI/CD com GitHub Actions
 
-O pipeline de Integração Contínua e Deployment Contínuo (CI/CD) foi implementado utilizando **GitHub Actions**, a ferramenta de automação nativa do GitHub, para construir, testar e implantar a aplicação na nuvem Azure. [cite: 5]
+O pipeline de Integração Contínua e Deployment Contínuo (CI/CD) foi implementado utilizando **GitHub Actions**, a ferramenta de automação nativa do GitHub, para construir, testar e implantar a aplicação na nuvem Azure.
 
 ### Ferramentas Utilizadas
 * **GitHub Actions:** Orquestração do workflow de CI/CD, execução de jobs e gerenciamento de segredos.
