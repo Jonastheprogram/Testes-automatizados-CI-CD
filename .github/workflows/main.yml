@@ -7,12 +7,12 @@ on:
   push:
     branches: [ "main" ]
 
-# Variáveis de ambiente, baseadas no seu azure-pipelines.yml
+# Variáveis de ambiente
 env:
-  AZURE_WEBAPP_NAME_STAGING: 'api-esg-fiap-staging'   #
-  AZURE_WEBAPP_NAME_PROD: 'api-esg-fiap-prod'         #
-  AZURE_CONTAINER_REGISTRY: 'rgapiesgfiap'            # Nome do seu ACR (ajuste se for diferente)
-  IMAGE_NAME: 'apiesgfiap'                          #
+  AZURE_WEBAPP_NAME_STAGING: 'api-esg-fiap-staging'   
+  AZURE_WEBAPP_NAME_PROD: 'api-esg-fiap-prod'         
+  AZURE_CONTAINER_REGISTRY: 'rgapiesgfiap'            
+  IMAGE_NAME: 'apiesgfiap'                          
 
 jobs:
   # --- JOB 1: BUILD E PUSH DA IMAGEM DOCKER ---
