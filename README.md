@@ -1,4 +1,4 @@
-# Projeto - Api Esg Fiap CI-CD
+# Projeto - Testes automatizados CI/CD para API
 
 Este repositório contém o código-fonte e a infraestrutura de CI/CD para a API do projeto Api ESG FIAP. A aplicação foi desenvolvida em .NET, containerizada com Docker e configurada para deploy automatizado na nuvem Microsoft Azure através do GitHub Actions.
 
