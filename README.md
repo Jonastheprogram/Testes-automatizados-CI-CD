@@ -1,3 +1,6 @@
+![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+
+
 # Testes automatizados CI/CD para API
 
 Este repositório contém o código-fonte e a infraestrutura de CI/CD para a API do projeto API-sistema-de-coletasESG. A aplicação foi desenvolvida em .NET, containerizada com Docker e configurada para deploy automatizado na nuvem Microsoft Azure através do GitHub Actions.
